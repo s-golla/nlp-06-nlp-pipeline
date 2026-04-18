@@ -81,30 +81,22 @@ def run_validate(
     # VALIDATE EXPECTATIONS
     # ============================================================
 
-    # Check for expected structural elements
-    title = soup.find("h1", class_="title")
-    authors = soup.find("div", class_="authors")
-    abstract = soup.find("blockquote", class_="abstract")
-    subjects = soup.find("div", class_="subheader")
-    dateline = soup.find("div", class_="dateline")
+    # Check for expected structural elements for Wikipedia page
+    title = soup.find("h1", id="firstHeading")
+    content = soup.find("div", id="mw-content-text")
+    first_paragraph = content.find("p") if content else None
 
     LOG.info("VALIDATE: Title found: %s", title is not None)
-    LOG.info("VALIDATE: Authors found: %s", authors is not None)
-    LOG.info("VALIDATE: Abstract found: %s", abstract is not None)
-    LOG.info("VALIDATE: Subjects found: %s", subjects is not None)
-    LOG.info("VALIDATE: Dateline found: %s", dateline is not None)
+    LOG.info("VALIDATE: Content found: %s", content is not None)
+    LOG.info("VALIDATE: First paragraph found: %s", first_paragraph is not None)
 
     missing = []
     if not title:
         missing.append("title")
-    if not authors:
-        missing.append("authors")
-    if not abstract:
-        missing.append("abstract")
-    if not subjects:
-        missing.append("subjects")
-    if not dateline:
-        missing.append("dateline")
+    if not content:
+        missing.append("content")
+    if not first_paragraph:
+        missing.append("first_paragraph")
 
     if missing:
         raise ValueError(

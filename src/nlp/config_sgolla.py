@@ -3,7 +3,7 @@ src/nlp/config_case.py - Module 5 Configuration
 (COPY AND MODIFY THIS FILE - do not edit the original)
 
 Stores configuration values for the web document EVTL pipeline.
-Source: arXiv abstract page for "Agents of Chaos" (2602.20021)
+Source: Wikipedia page for "Natural Language Processing"
 
 Purpose
 
@@ -34,7 +34,7 @@ from pathlib import Path
 # ============================================================
 
 # TODO: In your custom app, change the URL to work with a different page.
-PAGE_URL: str = "https://arxiv.org/abs/2602.20021"
+PAGE_URL: str = "https://en.wikipedia.org/wiki/Natural_language_processing"
 
 # Let them know who we are (and that we're doing educational web mining).
 HTTP_REQUEST_HEADERS: dict = {
@@ -52,5 +52,5 @@ PROCESSED_PATH: Path = DATA_PATH / "processed"
 
 # TODO: In your custom app, change the output file names from case_
 # to something that represents YOUR custom project.
-RAW_HTML_PATH: Path = RAW_PATH / "sgolla_raw.html"
-PROCESSED_CSV_PATH: Path = PROCESSED_PATH / "sgolla_processed.csv"
+RAW_HTML_PATH: Path = RAW_PATH / "sgolla_raw_new.html"
+PROCESSED_CSV_PATH: Path = PROCESSED_PATH / "sgolla_processed_new.csv"

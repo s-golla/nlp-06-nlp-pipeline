@@ -229,13 +229,13 @@ def run_transform(
         "We must manually inspect the HTML structure to identify the fields we want to extract."
     )
     LOG.info(
-        "For this arXiv page, we can extract:"
-        "\n- Title from <h1 class='title'>"
-        "\n- Authors from <div class='authors'>"
-        "\n- Abstract from <blockquote class='abstract'>"
-        "\n- Primary subject from <div class='subheader'>"
-        "\n- Submission date from <div class='dateline'>"
-        "\n- ArXiv ID from canonical link"
+        "For this Wikipedia page, we can extract:"
+        "\n- Title from <h1 id='firstHeading'>"
+        "\n- Content from <div id='mw-content-text'>"
+        "\n- First paragraph as 'abstract'"
+        "\n- Subject as 'Wikipedia'"
+        "\n- Authors as 'Wikipedia contributors'"
+        "\n- No arXiv ID for Wikipedia"
     )
     LOG.info("Replace any missing content with `unknown` to ensure all are strings.")
 
@@ -256,64 +256,46 @@ def run_transform(
     # See nlp-06-nlp-pipeline/src/nlp/stage03_transform_case.py for full explanation.
 
     LOG.info("------------------------")
-    LOG.info("Project specific: Extract title, authors, abstract")
+    LOG.info("Project specific: Extract title from Wikipedia")
     LOG.info("------------------------")
 
-    title_tag: Tag | None = soup.find("h1", class_="title")
-    title: str = _get_text(title_tag, strip_prefix="Title:")
+    title_tag: Tag | None = soup.find("h1", id="firstHeading")
+    title: str = _get_text(title_tag)
     LOG.info(f"Extracted title: {title}")
 
-    authors_tag: Tag | None = soup.find("div", class_="authors")
-    author_tags_list: list[Tag] = authors_tag.find_all("a") if authors_tag else []
-    authors: str = (
-        ", ".join([tag.get_text(strip=True) for tag in author_tags_list])
-        .replace("Authors:", "")
-        .strip()
-        if authors_tag
-        else "unknown"
-    )
-    LOG.info(f"Extracted authors: {authors}")
-
-    abstract_tag: Tag | None = soup.find("blockquote", class_="abstract")
-    abstract_raw: str = _get_text(abstract_tag, strip_prefix="Abstract:")
-    LOG.info(f"Extracted abstract: {abstract_raw[:100]}...")
-
     LOG.info("------------------------")
-    LOG.info("Project specific: Extract subjects from subheader")
+    LOG.info("Project specific: Extract first few paragraphs as abstract")
     LOG.info("------------------------")
 
-    # Primary subject from <div class="subheader">
-    subheader: Tag | None = soup.find("div", class_="subheader")
-
-    # Subjects may be in the format "Subjects: cs.AI (primary); cs.LG; stat.ML"
-    subjects: str = _get_text(subheader, strip_prefix="Subjects:")
-    LOG.info(f"Extracted subjects: {subjects}")
-
-    LOG.info("------------------------")
-    LOG.info("Project specific: Extract submission date from dateline")
-    LOG.info("------------------------")
-
-    # Submission date from <div class="dateline">
-    dateline: Tag | None = soup.find("div", class_="dateline")
-    date_submitted_str: str = _get_text(dateline)
-    LOG.info(f"Extracted submission date: {date_submitted_str}")
-
-    LOG.info("------------------------")
-    LOG.info("Project specific: Extract arxiv_id from canonical link")
-    LOG.info("------------------------")
-
-    # The canonical link looks like this in the HTML <head>:
-    #   <link rel="canonical" href="https://arxiv.org/abs/2602.20021"/>"
-    canonical: Tag | None = soup.find("link", rel="canonical")
-
-    if canonical is None:
-        LOG.warning("Canonical link not found, setting arXiv ID to 'unknown'")
-        arxiv_id: str = "unknown"
+    content_div: Tag | None = soup.find("div", id="mw-content-text")
+    if content_div:
+        # Get the first few paragraphs that have actual text
+        paragraphs = content_div.find_all("p", limit=3)  # Get first 3 paragraphs
+        abstract_parts = []
+        for p in paragraphs:
+            text = p.get_text(strip=True)
+            if text and not text.startswith('['):  # Skip reference-only paragraphs
+                abstract_parts.append(text)
+        abstract_raw: str = " ".join(
+            abstract_parts[:2]
+        )  # Take first 2 meaningful paragraphs
     else:
-        href: str = str(canonical["href"])
-        arxiv_id: str = href.split("/abs/")[-1]
+        abstract_raw: str = "unknown"
+    LOG.info(f"Extracted abstract: {abstract_raw[:200]}...")
 
-    LOG.info(f"Extracted arxiv_id: {arxiv_id}")
+    LOG.info("------------------------")
+    LOG.info("Project specific: Set authors and subjects for Wikipedia")
+    LOG.info("------------------------")
+
+    authors: str = "Wikipedia contributors"
+    subjects: str = "Wikipedia"
+    date_submitted_str: str = "N/A"
+    arxiv_id: str = "N/A"
+
+    LOG.info(f"Set authors: {authors}")
+    LOG.info(f"Set subjects: {subjects}")
+    LOG.info(f"Set submission date: {date_submitted_str}")
+    LOG.info(f"Set arxiv_id: {arxiv_id}")
 
     LOG.info("========================")
     LOG.info("PHASE 3.2: Clean and normalize text fields")
@@ -379,9 +361,7 @@ def run_transform(
     LOG.info(f"  abstract_word_count: {abstract_raw_word_count}")
 
     # Calculate derived field: author count
-    author_count: int = (
-        len([a.strip() for a in authors.split(",")]) if authors != "unknown" else 0
-    )
+    author_count: int = 1  # Wikipedia contributors
     LOG.info(f"  author_count:        {author_count}")
 
     # Tokenize the cleaned abstract
