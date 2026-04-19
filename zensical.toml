@@ -62,4 +62,5 @@ nav = [
     { "NLP Evolution" = "nlp-evolution.md" },
     { "Glossary" = "glossary.md" },
     { "Project Instructions" = "project-instructions.md" },
+    { "NLP Portfolio" = "nlp-Portfolio.md" },
 ]
