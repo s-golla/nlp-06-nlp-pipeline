@@ -1,7 +1,7 @@
 # NLP Portfolio: Web Mining & Text Analysis
 
-**Author**: Sarat Golla  
-**Last Updated**: April 18, 2026  
+**Author**: Saratchandra Golla  
+**Last Updated**: April 2026  
 **Repository**: [github.com/s-golla/nlp-06-nlp-pipeline](https://github.com/s-golla/nlp-06-nlp-pipeline)
 
 ## Executive Summary
@@ -58,8 +58,6 @@ In this section, I describe the real-world web data I processed—arXiv academic
 **Author Parsing**: arXiv embeds author names in anchor tags within a `<div class="authors">` container. I iterated through HTML elements using BeautifulSoup's list methods rather than assuming text extraction would work directly, documented in `stage03_transform_sgolla.py` as the "author_count" derivation and stored in the `author_count` column of the output DataFrame.
 
 ---
-
-## 3. Pipeline Structure (EVTAL)
 
 ## 3. Pipeline Structure (EVTAL)
 

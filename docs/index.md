@@ -17,3 +17,4 @@ to get these projects running on your machine.
 - **NLP Evolution** - a relatively concise discussion of NLP evolution
 - **Project Instructions** - instructions specific to this module
 - **Glossary** - project terms and concepts
+- **NLP Portfolio** - showcases applied NLP work with EVTAL pipeline, visualizations, and analysis across multiple data sources
